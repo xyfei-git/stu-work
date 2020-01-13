@@ -34,7 +34,7 @@ mybatis-plus:
 #mybatis-plus end
 
 logging:
-  config: classpath:log.xml
   level:
     cn.jay.repository: trace
+  config: classpath:log4j.properties
 
