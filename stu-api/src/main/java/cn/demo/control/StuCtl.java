@@ -37,7 +37,6 @@ public class StuCtl {
             map.put("code",200);
             map.put("message","ok");
             map.put("data",stu);
-            int i=9/0;
             log.debug("success");
         }catch (Exception e){
             e.printStackTrace();
