@@ -31,13 +31,13 @@ public class StuCtl {
 
     @RequestMapping("initStuList")
     public Map<String,Object> initStuList(StuBean stu){
-
         Map<String,Object> map=new HashMap<>();
         try {
             stu =stuService.initStuList(stu);
             map.put("code",200);
             map.put("message","ok");
             map.put("data",stu);
+            int i=9/0;
             log.debug("success");
         }catch (Exception e){
             e.printStackTrace();
@@ -46,7 +46,6 @@ public class StuCtl {
             map.put("message",e.getMessage());
         }
         return map;
-
     }
     @RequestMapping("fileInput")
     public Map<String,Object> fileInput(@RequestParam(value = "file",required = false) MultipartFile file, HttpServletRequest request){
