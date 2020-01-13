@@ -5,10 +5,15 @@ import cn.demo.entity.ExcelStu;
 import cn.demo.entity.po.Stu;
 import cn.demo.entity.vo.StuBean;
 import cn.demo.service.StuService;
+import cn.demo.util.PoiExcelAnnotation;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StuServiceImpl implements StuService {
@@ -50,5 +55,26 @@ public class StuServiceImpl implements StuService {
     public List<ExcelStu> getAllStu() {
         List<ExcelStu> list=stuDao.getAllStu();
         return list;
+    }
+
+    @Override
+    public Map<String,Object> getExportData() throws ClassNotFoundException {
+        Class<?> clazz = Class.forName("cn.demo.entity.ExcelStu");
+        Map<String,Object> map=new HashMap<>();
+        Field[] fields=clazz.getDeclaredFields();
+        List<String> fileds=new ArrayList<>();
+        List<String> coloums=new ArrayList<>();
+        for (Field field : fields) {
+            PoiExcelAnnotation annotation = field.getAnnotation(PoiExcelAnnotation.class);
+            if(annotation != null){
+                String name = field.getName();
+                String value = annotation.value();
+                fileds.add(name);
+                coloums.add(value);
+            }
+        }
+        map.put("fileds",fileds);
+        map.put("coloums",coloums);
+        return map;
     }
 }

@@ -5,6 +5,7 @@ import cn.demo.entity.po.Stu;
 import cn.demo.entity.vo.StuBean;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StuService {
     StuBean initStuList(StuBean stu);
@@ -16,4 +17,6 @@ public interface StuService {
     void delThis(Integer id);
 
     List<ExcelStu> getAllStu();
+
+    Map<String,Object> getExportData() throws ClassNotFoundException;
 }

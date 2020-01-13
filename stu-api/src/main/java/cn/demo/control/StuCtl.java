@@ -14,10 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("stu")
@@ -46,6 +43,25 @@ public class StuCtl {
         }
         return map;
     }
+
+    @RequestMapping("getExportData")
+    public Map<String,Object> getExportData(){
+        Map<String,Object> map=new HashMap<>();
+        try {
+            Map<String,Object> data=stuService.getExportData();
+            map.put("code",200);
+            map.put("message","ok");
+            map.put("data",data);
+            log.debug("success");
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            map.put("code",500);
+            map.put("message",e.getMessage());
+        }
+        return map;
+    }
+
     @RequestMapping("fileInput")
     public Map<String,Object> fileInput(@RequestParam(value = "file",required = false) MultipartFile file, HttpServletRequest request){
         Map<String,Object> map=new HashMap<>();
@@ -127,11 +143,22 @@ public class StuCtl {
     }
 
     @RequestMapping("exportExcel")
-    public Map<String,Object> exportExcel(){
+    public Map<String,Object> exportExcel(String field,String coloums){
         Map<String,Object> map=new HashMap<>();
         try {
+            String[] fields = field.split(",");
+            String[] coloum = coloums.split(",");
+            List<String> filedes=new ArrayList<>();
+            List<String> coloumes=new ArrayList<>();
+            for (int i = 0; i < fields.length; i++) {
+                filedes.add(fields[i]);
+                coloumes.add(coloum[i]);
+            }
+            Map<String,Object> m=new HashMap<>();
+            m.put("fileds",filedes);
+            m.put("coloums",coloumes);
             List<ExcelStu> list= stuService.getAllStu();
-            String s = ExcelRefAnno.exportExcel(list, ExcelStu.class);
+            String s = ExcelRefAnno.exportExcel(list, ExcelStu.class,m);
             map.put("code",200);
             map.put("message","ok");
             map.put("data",s);

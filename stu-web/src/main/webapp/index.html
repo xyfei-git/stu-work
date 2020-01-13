@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootbox.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
 </head>
 <body>
 <input type="button" value="添加" onclick="toManage()">
-<input type="button" value="导出Excel" onclick="exportExcel()">
+<input type="button" value="导出Excel" onclick="getExportData()">
 <table id="stuList"></table>
 <div id="pageData"></div>
 </body>
@@ -18,17 +22,58 @@
     }
 
 
-    function exportExcel() {
+    function getExportData() {
+        bootbox.confirm({
+            size: "large",
+            message: "<div id='chooseData'></div>",
+            callback: function(result){
+                if (result){
+                    var all=$("[name=all]");
+                    var field="";
+                    var coloums="";
+                    for (var i = 0; i < all.length; i++) {
+                        if (all[i].checked==true){
+                            field+=$(all[i]).val()+",";
+                            coloums+=$(all[i]).attr("coloums")+",";
+                        }
+                    }
+                    field=field.substring(0,field.length-1)
+                    coloums=coloums.substring(0,coloums.length-1)
+                    $.ajax({
+                        url: "http://localhost:8082/stu/exportExcel",
+                        dataType: "json",
+                        type: "post",
+                        data:{"field":field,"coloums":coloums},
+                        async:false,
+                        success: function (re) {
+                            if (re.code == 200) {
+                                alert("请等待");
+                                    sleep(10000);
+                                    location.href=re.data;
+                            } else {
+                                alert(re.message);
+                            }
+                        }, error: function () {
+                            alert("请求失败");
+                        }
+                    })
+                }
+            }
+        })
         $.ajax({
-            url: "http://localhost:8082/stu/exportExcel",
+            url: "http://localhost:8082/stu/getExportData",
             dataType: "json",
             type: "post",
+            async:false,
             success: function (re) {
                 if (re.code == 200) {
-                    alert("请等待");
-                    sleep(10000);
-                    alert(re.data);
-                    location.href=re.data;
+                    var str='';
+                    var field=re.data.fileds;
+                    var coloums=re.data.coloums;
+                    for (var i = 0; i < field.length; i++) {
+                        str+='<input type="checkbox" coloums="'+coloums[i]+'" name="all" value="'+field[i]+'"/>'+coloums[i];
+                    }
+                    $("#chooseData").html(str);
                 } else {
                     alert(re.message);
                 }

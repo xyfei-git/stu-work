@@ -16,6 +16,16 @@ public class ExcelStu {
     private Date birthday;
     @PoiExcelAnnotation("地址")
     private String address;
+    @PoiExcelAnnotation("图片")
+    private String img;
+
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 
     public Integer getId() {
         return id;
