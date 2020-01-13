@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<input type="button" value="添加" onclick="toManage()">
+<input type="button" value="导出Excel" onclick="exportExcel()">
+<table id="stuList"></table>
+<div id="pageData"></div>
+</body>
+<script>
+
+    function toManage(){
+        location.href="/manage.html";
+    }
+
+
+    function exportExcel() {
+        $.ajax({
+            url: "http://localhost:8082/stu/exportExcel",
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    location.href=re.data;
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+
+    function delThis(id) {
+        $.ajax({
+            url: "http://localhost:8082/stu/delThis",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    initStuList();
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+    $(function () {
+        initStuList(1);
+    })
+    function initStuList(page) {
+            var size = $("#size").val();
+            if (size==null){
+                size = 3;
+            }
+            $.ajax({
+                url:"http://localhost:8082/stu/initStuList",
+                dataType:"json",
+                type:"post",
+                data:{"pageIndex":page,"pageSize":size},
+                success:function (re) {
+                    if (re.code==200){
+                        var str = '<tr>\n' +
+                            '        <td>名称</td>\n' +
+                            '        <td>性别</td>\n' +
+                            '        <td>年龄</td>\n' +
+                            '        <td>所在地</td>\n' +
+                            '        <td>出生日期</td>\n' +
+                            '        <td>图片</td>\n' +
+                            '        <td>操作</td>\n' +
+                            '    </tr>';
+                        var data=re.data;
+                        for (var i = 0; i < data.list.length; i++) {
+                                str += '<tr>\n' +
+                                '        <td>'+data.list[i].name+'</td>\n' ;
+                            if (data.list[i].sex==1){
+                                str+='        <td>男</td>\n';
+                            }else{
+                                str+='        <td>女</td>\n';
+                            }
+
+                                str+='        <td>'+data.list[i].age+'</td>\n' +
+                                '        <td>'+data.list[i].address+'</td>\n' +
+                                '        <td>'+data.list[i].birthday+'</td>\n' +
+                                '        <td><img src="'+data.list[i].img+'"></td>\n' +
+                                '        <td>' +
+                                    '<input type="button" value="删除" onclick="delThis('+data.list[i].id+')">' +
+                                    '<input type="button" value="修改" onclick="updateThis('+data.list[i].id+')">' +
+                                    '</td>\n' +
+                                '    </tr>';
+                        }
+                        var s=' 当前第<input type="text" onmouseout="initStuList()" id="page" value="'+data.pageIndex+'" style="width: 20px"/>页\n';
+                        if (data.pageIndex==1){
+                            s+='        首页\n' +
+                                '        上一页\n' ;
+                        }
+
+                        if (data.pageIndex>1){
+                            s+= '        <a href="javascript:;" onclick="initStuList(1)">首页</a>\n' +
+                                '        <a href="javascript:;" onclick="initStuList('+(data.pageIndex-1)+')">上一页</a>\n';
+                        }
+
+
+                        if (data.pageIndex==data.pageTotal){
+                            s+='        下一页\n' +
+                                '        尾页\n';
+                        }
+
+
+                        if (data.pageIndex < data.pageTotal){
+                            s+= '        <a href="javascript:;" onclick="initStuList('+parseInt(data.pageIndex+1)+')">下一页</a>\n' +
+                                '        <a href="javascript:;" onclick="initStuList('+data.pageTotal+')">尾页</a>\n';
+                        }
+
+
+                        s+='    共'+data.pageTotal+'页'+data.total+'条\n' +
+                            '    每页\n' +
+                            '    <select id="size" onchange="initStuList('+data.pageTotal+')">\n';
+                        if(data.pageSize==3){
+                            s+=  '        <option value="3" selected>3</option>\n';
+                        }else{
+                            s+=  '        <option value="3">3</option>\n';
+                        }
+                        if(data.pageSize==5){
+                            s+=  '        <option value="5" selected>5</option>\n';
+                        }else{
+                            s+=  '        <option value="5">5</option>\n';
+                        }
+                        if(data.pageSize==10){
+                            s+=  '        <option value="10" selected>10</option>\n';
+                        }else{
+                            s+=  '        <option value="10">10</option>\n';
+                        }
+                        s+='    </select>\n' +
+                            '    条';
+                        $("#pageData").html(s);
+                        $("#stuList").html(str);
+                    }else{
+                        alert(re.message);
+                    }
+                },error:function () {
+                    alert("请求失败");
+                }
+            })
+        }
+
+        function updateThis(id) {
+            sessionStorage.setItem("id",id);
+            location.href='/manage.html';
+        }
+
+</script>
+</html>
