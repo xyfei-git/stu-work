@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.demo.dao.StuDao">
+
+    <select id="selectStuList" parameterType="cn.demo.entity.vo.StuBean" resultType="java.util.Map">
+
+    select id,name,age,sex,birthday,address,img,isDel from t_stu limit #{startIndex},#{pageSize}
+
+    </select>
+
+    <select id="selectStuCount" parameterType="cn.demo.entity.vo.StuBean" resultType="java.lang.Long" >
+
+      select count(id) from t_stu
+
+    </select>
+    <update id="updateThis" parameterType="java.lang.Integer">
+
+        update t_stu set isDel = 1 where id=#{id}
+
+    </update>
+
+    <select id="getAllStu" resultType="cn.demo.entity.ExcelStu">
+
+        select * from t_stu
+
+    </select>
+
+</mapper>
