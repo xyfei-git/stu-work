@@ -59,7 +59,7 @@ public class StuCtl {
                 f.mkdir();
             }
             file.transferTo(new File(path+"\\"+newFileName));
-            map.put("data",path+"\\"+newFileName);
+            map.put("data","img/"+newFileName);
             map.put("code",200);
             map.put("message","ok");
             log.debug("success");

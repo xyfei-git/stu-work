@@ -25,6 +25,9 @@
             type: "post",
             success: function (re) {
                 if (re.code == 200) {
+                    alert("请等待");
+                    sleep(10000);
+                    alert(re.data);
                     location.href=re.data;
                 } else {
                     alert(re.message);
@@ -33,6 +36,12 @@
                 alert("请求失败");
             }
         })
+    }
+    function sleep(delay) {
+        var start = (new Date()).getTime();
+        while ((new Date()).getTime() - start < delay) {
+            continue;
+        }
     }
 
 
@@ -91,7 +100,7 @@
                                 str+='        <td>'+data.list[i].age+'</td>\n' +
                                 '        <td>'+data.list[i].address+'</td>\n' +
                                 '        <td>'+data.list[i].birthday+'</td>\n' +
-                                '        <td><img src="'+data.list[i].img+'"></td>\n' +
+                                '        <td><img src="/'+data.list[i].img+'"></td>\n' +
                                 '        <td>' +
                                     '<input type="button" value="删除" onclick="delThis('+data.list[i].id+')">' +
                                     '<input type="button" value="修改" onclick="updateThis('+data.list[i].id+')">' +
