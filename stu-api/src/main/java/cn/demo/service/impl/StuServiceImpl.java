@@ -77,4 +77,6 @@ public class StuServiceImpl implements StuService {
         map.put("coloums",coloums);
         return map;
     }
+
+
 }

@@ -5,18 +5,20 @@ import cn.demo.entity.po.Stu;
 import cn.demo.entity.vo.StuBean;
 import cn.demo.service.StuService;
 import cn.demo.util.ExcelRefAnno;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
 
-@RestController
+@Controller
 @RequestMapping("stu")
 @CrossOrigin
 public class StuCtl {
@@ -25,7 +27,7 @@ public class StuCtl {
 
     @Resource
     private StuService stuService;
-
+    @ResponseBody
     @RequestMapping("initStuList")
     public Map<String,Object> initStuList(StuBean stu){
         Map<String,Object> map=new HashMap<>();
@@ -35,6 +37,7 @@ public class StuCtl {
             map.put("message","ok");
             map.put("data",stu);
             log.debug("success");
+            int i=0/8;
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
@@ -43,7 +46,7 @@ public class StuCtl {
         }
         return map;
     }
-
+    @ResponseBody
     @RequestMapping("getExportData")
     public Map<String,Object> getExportData(){
         Map<String,Object> map=new HashMap<>();
@@ -61,7 +64,7 @@ public class StuCtl {
         }
         return map;
     }
-
+    @ResponseBody
     @RequestMapping("fileInput")
     public Map<String,Object> fileInput(@RequestParam(value = "file",required = false) MultipartFile file, HttpServletRequest request){
         Map<String,Object> map=new HashMap<>();
@@ -87,7 +90,7 @@ public class StuCtl {
         }
         return map;
     }
-
+    @ResponseBody
     @RequestMapping("saveManage")
     public Map<String,Object> saveManage(Stu stu){
         Map<String,Object> map=new HashMap<>();
@@ -106,7 +109,7 @@ public class StuCtl {
         return map;
     }
 
-
+    @ResponseBody
     @RequestMapping("getInfoById")
     public Map<String,Object> getInfoById(Integer id){
         Map<String,Object> map=new HashMap<>();
@@ -124,7 +127,7 @@ public class StuCtl {
         }
         return map;
     }
-
+    @ResponseBody
     @RequestMapping("delThis")
     public Map<String,Object> delThis(Integer id){
         Map<String,Object> map=new HashMap<>();
@@ -141,9 +144,8 @@ public class StuCtl {
         }
         return map;
     }
-
     @RequestMapping("exportExcel")
-    public Map<String,Object> exportExcel(String field,String coloums){
+    public void exportExcel(String field, String coloums, HttpServletResponse response){
         Map<String,Object> map=new HashMap<>();
         try {
             String[] fields = field.split(",");
@@ -158,10 +160,7 @@ public class StuCtl {
             m.put("fileds",filedes);
             m.put("coloums",coloumes);
             List<ExcelStu> list= stuService.getAllStu();
-            String s = ExcelRefAnno.exportExcel(list, ExcelStu.class,m);
-            map.put("code",200);
-            map.put("message","ok");
-            map.put("data",s);
+            ExcelRefAnno.exportExcelSteam(list, ExcelStu.class,m,response);
             log.debug("success");
         }catch (Exception e){
             log.error(e.getMessage());
@@ -169,6 +168,5 @@ public class StuCtl {
             map.put("code",500);
             map.put("message",e.getMessage());
         }
-        return map;
     }
 }

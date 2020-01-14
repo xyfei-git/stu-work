@@ -1,5 +1,6 @@
 package cn.demo.util;
 
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -62,7 +63,24 @@ public class ExcelRefAnno {
         bean.setSheetName(annotation.sheetName());
         bean.setMkdir(annotation.mkdir());
         bean.setData(dataList);
-        return ExportExcelUtil.exportExcel(bean,clazz);
+        return ExportExcelUtil.exportExcelforLocal(bean,clazz);
     }
 
+
+    /**
+     *导出Excel的公共调用方法
+     * @param clazz
+     * @return
+     */
+    public static  void exportExcelSteam(List<?> dataList, Class clazz, Map<String,Object> m, HttpServletResponse response) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+
+        ExcelUtilBean bean=new ExcelUtilBean();
+        getExportField(bean,clazz,m);
+        PoiExcelAnnotation annotation = (PoiExcelAnnotation) clazz.getAnnotation(PoiExcelAnnotation.class);
+        bean.setTitle(annotation.title());
+        bean.setSheetName(annotation.sheetName());
+        bean.setMkdir(annotation.mkdir());
+        bean.setData(dataList);
+        ExportExcelUtil.exportExcelforSteam(bean,clazz,response);
+    }
 }

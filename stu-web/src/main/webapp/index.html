@@ -39,7 +39,8 @@
                     }
                     field=field.substring(0,field.length-1)
                     coloums=coloums.substring(0,coloums.length-1)
-                    $.ajax({
+                    location.href="http://localhost:8082/stu/exportExcel?field="+field+"&coloums="+coloums;
+                    /*$.ajax({
                         url: "http://localhost:8082/stu/exportExcel",
                         dataType: "json",
                         type: "post",
@@ -48,15 +49,13 @@
                         success: function (re) {
                             if (re.code == 200) {
                                 alert("请等待");
-                                    sleep(10000);
-                                    location.href=re.data;
                             } else {
                                 alert(re.message);
                             }
                         }, error: function () {
                             alert("请求失败");
                         }
-                    })
+                    })*/
                 }
             }
         })
