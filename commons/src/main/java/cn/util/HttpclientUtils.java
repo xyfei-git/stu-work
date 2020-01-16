@@ -1,5 +1,6 @@
 package cn.util;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
@@ -69,9 +70,7 @@ public class HttpclientUtils {
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             String s = EntityUtils.toString(entity, "UTF-8");
-            map.put("data",s);
-            map.put("code",200);
-            map.put("message","ok");
+            map = (Map<String, Object>) JSONObject.parse(s);
             return map;
         } catch (HttpHostConnectException e) {
             e.printStackTrace();

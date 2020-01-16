@@ -61,7 +61,7 @@ background-size: 100% 100%;
 <div class="snow-container">
 
 </div>
-<div class="a" style="margin-top: 13%;width: 33.33%;margin-left: 33.33%;padding-top:15px;height: 240px;">
+<div class="a" style="margin-top: 13%;width: 33.33%;margin-left: 33.33%;padding-top:15px;height: 240px;border-radius:15%">
     <form class="form-horizontal" role="form">
         <div class="form-group">
             <label for="phone" class="col-sm-2 control-label" style="color: #81ee0b">手机号</label>
@@ -84,9 +84,9 @@ background-size: 100% 100%;
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-5">
-                <button type="button" class="btn btn-default btn-lg btn-block">注册</button>
+                <button type="button" class="btn btn-default btn-lg btn-block" onclick="toRegist()">注册</button>
             </div>
-            <button type="button" class="btn btn-default btn-lg">前去登录</button>
+            <button type="button" class="btn btn-default btn-lg" onclick="toLogin()">前去登录</button>
         </div>
     </form>
 </div>
@@ -97,27 +97,31 @@ background-size: 100% 100%;
 <script>
 
     function sendCode(obj) {
-        $(obj).attr("disabled","disabled");
-        var timer_num = 60;
-        timeClock = setInterval(function () {
-            timer_num--;
-            $(obj).html("剩余" + timer_num + "秒");
-
-            if (timer_num == 0) {
-                clearInterval(timeClock);
-                $(obj).removeAttr("disabled");
-                $(obj).html("发送验证码");
-            }
-        }, 1000)
        var phone= $("#phone").val();
        if (phone!=null && phone !=""){
+           $(obj).attr("disabled","disabled");
+           var timer_num = 60;
+           timeClock = setInterval(function () {
+               timer_num--;
+               $(obj).html("剩余" + timer_num + "秒");
+
+               if (timer_num == 0) {
+                   clearInterval(timeClock);
+                   $(obj).removeAttr("disabled");
+                   $(obj).html("发送验证码");
+               }
+           }, 1000)
            $.ajax({
-               url:"/user/sendCodeWithRegist",
+               url:"/user/sendCodeWithRegist.api",
                data:{"phone":phone},
                type:"post",
                dataType:"json",
                success:function (re) {
-                    alert(JSON.stringify(re));
+                    if (re.code==200) {
+                        showMsg(re.message,"center")
+                    }else{
+                        showMsg(re.message,"center");
+                    }
                },error:function () {
                    alert("请求失败");
                }
@@ -125,7 +129,46 @@ background-size: 100% 100%;
        }else{
            showMsg("手机号不能为空","center");
        }
+    }
 
+    function toRegist() {
+        var phone= $("#phone").val();
+        var passwd= $("#passwd").val();
+        var code= $("#code").val();
+        if (phone==null || phone ==""){
+            showMsg("手机号不能为空","center");
+            return false;
+        }
+        if (passwd==null ||passwd ==""){
+            showMsg("密码不能为空","center");
+            return false;
+        }
+        if (code==null || code ==""){
+            showMsg("验证码不能为空","center");
+            return false;
+        }
+        $.ajax({
+            url:"/user/registUser.api",
+            type:"post",
+            dataType:"json",
+            data:{"passwd":passwd,"phone":phone,"code":code},
+            success:function (re) {
+                if (re.code==200){
+                    showMsg(re.message,"center");
+                    toLogin();
+                } else{
+                    showMsg(re.message,"center");
+                }
+            },error:function () {
+                alert("请求失败");
+            }
+        })
+
+
+    }
+
+    function toLogin() {
+        location.href="/login.html";
     }
 
 </script>

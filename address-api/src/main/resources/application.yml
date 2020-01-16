@@ -1,6 +1,6 @@
 #server begin
 server:
-  port: 8084
+  port: 8083
 #server end
 
 
@@ -14,12 +14,11 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
 
 #datasource end
-  #redis begin
+
   redis:
     host: 192.168.126.155
     port: 6379
     password: xyfei
-#redis end
 
 #mybatis-plus begin
 mybatis-plus:

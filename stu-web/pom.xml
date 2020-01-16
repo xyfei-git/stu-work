@@ -93,6 +93,7 @@
       <artifactId>fastjson</artifactId>
       <version>1.1.41</version>
     </dependency>
+
     <dependency>
       <groupId>cn.dmeo</groupId>
       <artifactId>commons</artifactId>

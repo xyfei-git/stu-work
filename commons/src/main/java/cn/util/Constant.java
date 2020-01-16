@@ -15,4 +15,6 @@ public interface   Constant {
     public static final String PHONE_CODE="phone_code";
 
     public static final String CODE_="code_";
+
+    public static final String TOKEN_LOGIN_="token_login";
 }
