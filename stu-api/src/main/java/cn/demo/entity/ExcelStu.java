@@ -1,22 +1,31 @@
 package cn.demo.entity;
 import cn.demo.util.PoiExcelAnnotation;
+import cn.demo.utils.ExcelAnnotation;
 
 import java.util.Date;
 @PoiExcelAnnotation(title = "学生表数据",sheetName="学生",mkdir="/excel/")
+@ExcelAnnotation(title = "学生表数据",sheetName = "学生信息")
 public class ExcelStu {
     @PoiExcelAnnotation("主键")
+    @ExcelAnnotation(colomn = "主键")
     private Integer id;
     @PoiExcelAnnotation("姓名")
+    @ExcelAnnotation(colomn = "姓名")
     private String name;
     @PoiExcelAnnotation("年龄")
+    @ExcelAnnotation(colomn = "年龄")
     private Integer age;
     @PoiExcelAnnotation("性别")
+    @ExcelAnnotation(colomn = "性别")
     private Integer sex;
     @PoiExcelAnnotation("生日")
+    @ExcelAnnotation(colomn = "生日")
     private Date birthday;
     @PoiExcelAnnotation("地址")
+    @ExcelAnnotation(colomn = "地址")
     private String address;
     @PoiExcelAnnotation("图片")
+    @ExcelAnnotation(colomn = "图片")
     private String img;
 
     public String getImg() {

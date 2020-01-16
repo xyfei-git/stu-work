@@ -14,8 +14,17 @@
 <form id="stuForm">
     <input type="hidden" name="img" id="img">
     <input type="hidden" name="id" id="id">
+    <input type="hidden" name="address" id="address">
     姓名:<input type="text" name="name" id="name"><br/>
-    地址：<input type="text" name="address" id="address"><br/>
+    地址：
+    <select onchange="initCitys()" name="provinceId" id="province"></select>
+    <select onchange="initAreas()" name="cityId" id="city">
+        <option value="0">--请选择--</option>
+    </select>
+    <select onchange="getData()" name="areaId" id="area">
+        <option value="0">--请选择--</option>
+    </select>
+    <br/>
     年龄：<input type="text" name="age" id="age"/><br/>
     生日：<input type="date" name="birthday" id="birthday"><br/>
     性别：
@@ -28,28 +37,90 @@
 </body>
 <script>
 
-    var id=sessionStorage.getItem("id");
-    sessionStorage.clear();
-    if (id!=null && id!=""){
+    $(function () {
+        initProvince();
+
+    })
+
+    function f() {
+        var id=sessionStorage.getItem("id");
+        sessionStorage.clear();
+        if (id!=null && id!=""){
+            $.ajax({
+                url:"http://localhost:8082/stu/getInfoById",
+                data:{"id":id},
+                dataType:"json",
+                type:"post",
+                success:function (re) {
+                    if (re.code==200){
+                        $("#id").val(re.stu.id);
+                        $("#img").val(re.stu.img);
+                        $("#name").val(re.stu.name);
+                        $("#age").val(re.stu.age);
+                        $("#address").val(re.stu.address);
+                        var sex=$("[name=sex]");
+                        for (var i = 0; i < sex.length; i++) {
+                            if (sex[i].value==re.stu.sex){
+                                $(sex[i]).attr("checked",true);
+                            }
+                        }
+                        var data=chageDate(re.stu.birthday);
+                        $("#birthday").val(data);
+                        var province=$("[name=provinceId]").find("option");
+                        for (var i = 0; i < province.length; i++) {
+                            if ($(province[i]).val() ==re.stu.provinceId){
+                                $(province[i]).attr("selected",true);
+                            }
+                        }
+                        var cityHtml="<option value='0'>--请选择--</option>";
+                        for (var i = 0; i <re.city.data.length ; i++) {
+                            if (re.city.data[i].id==re.stu.cityId){
+                                cityHtml+='<option selected value="'+re.city.data[i].id+'">'+re.city.data[i].name+'</option>';
+                            }else{
+                                cityHtml+='<option value="'+re.city.data[i].id+'">'+re.city.data[i].name+'</option>';
+                            }
+                        }
+                        $("#city").html(cityHtml);
+                        var areaHtml="<option value='0'>--请选择--</option>";
+                        for (var i = 0; i <re.area.data.length ; i++) {
+                            if (re.area.data[i].id==re.stu.areaId){
+                                areaHtml+='<option selected value="'+re.area.data[i].id+'">'+re.area.data[i].name+'</option>';
+                            }else{
+                                areaHtml+='<option value="'+re.area.data[i].id+'">'+re.area.data[i].name+'</option>';
+                            }
+                        }
+                        $("#area").html(areaHtml);
+                    } else{
+                        alert(re.message);
+                    }
+                },error:function () {
+                    alert("请求失败");
+                }
+            })
+        }
+    }
+
+    function getData() {
+        var name=$("#area").find("option:selected").text();
+        $("#address").val($("#province").find("option:selected").text()+","+$("#city").find("option:selected").text()+","+name);
+    }
+    function initAreas() {
+        var id=$("#city").val();
+        var name=$("#city").find("option:selected").text();
+        $("#address").val($("#province").find("option:selected").text()+","+name);
         $.ajax({
-            url:"http://localhost:8082/stu/getInfoById",
-            data:{"id":id},
+            url:"http://localhost:8083/area/initArea",
             dataType:"json",
+            data:{"id":id},
             type:"post",
             success:function (re) {
                 if (re.code==200){
-                    $("#id").val(re.data.id);
-                    $("#img").val(re.data.img);
-                    $("#name").val(re.data.name);
-                    $("#age").val(re.data.age);
-                    $("#address").val(re.data.address);
-                    var sex=$("[name=sex]");
-                    for (var i = 0; i < sex.length; i++) {
-                        if (sex[i].value==re.data.sex){
-                            $(sex[i]).attr("checked",true);
-                        }
+                    var str ="<option value='0'>--请选择--</option>";
+                    var data= re.data;
+                    for (var i = 0; i < data.length; i++) {
+                        str+='<option value="'+data[i].id+'">'+data[i].name+'</option>'
                     }
-                    $("#birthday").val(chageDate(re.data.birthday));
+                    $("#area").html(str);
                 } else{
                     alert(re.message);
                 }
@@ -59,11 +130,70 @@
         })
     }
 
-    function chageDate(date){
-        var d=new Date(date);
+    function initCitys() {
+        var id=$("#province").val();
+        var name=$("#province").find("option:selected").text();
+        $("#address").val(name);
+        $("#area").html("<option value='0'>--请选择--</option>");
+        $.ajax({
+            url:"http://localhost:8083/city/initCity",
+            dataType:"json",
+            data:{"id":id},
+            type:"post",
+            success:function (re) {
+                if (re.code==200){
+                    var str ="<option value='0'>--请选择--</option>";
+                    var data= re.data;
+                    for (var i = 0; i < data.length; i++) {
+                        str+='<option value="'+data[i].id+'">'+data[i].name+'</option>'
+                    }
+                    $("#city").html(str);
+                } else{
+                    alert(re.message);
+                }
+            },error:function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+
+
+    function initProvince() {
+        $.ajax({
+            url:"http://localhost:8083/province/initProvice",
+            dataType:"json",
+            type:"post",
+            async:false,
+            success:function (re) {
+                if (re.code==200){
+                    var str ="<option value='0'>--请选择--</option>";
+                   var data= re.data;
+                    for (var i = 0; i < data.length; i++) {
+                        str+='<option value="'+data[i].id+'">'+data[i].name+'</option>'
+                    }
+                   $("#province").html(str);
+                    f();
+                } else{
+                    alert(re.message);
+                }
+            },error:function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+    function chageDate(d){
+        d=new Date(d);
         var y=d.getFullYear();
         var m=parseInt(d.getMonth()+1);
+        if (m<10){
+            m="0"+m;
+        }
         var day=d.getDate();
+        if (day<10){
+            day = "0"+day;
+        }
         return y+"-"+m+"-"+day;
     }
 

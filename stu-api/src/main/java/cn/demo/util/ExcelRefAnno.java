@@ -28,7 +28,7 @@ public class ExcelRefAnno {
         Field[] fields=clazz.getDeclaredFields();
         List<String> filedes =null;
         List<String> coloums=null;
-        if (m!=null){
+        if (m != null){
             filedes = (List<String>) m.get("fileds");
             coloums = (List<String>) m.get("coloums");
         }
@@ -36,11 +36,16 @@ public class ExcelRefAnno {
             PoiExcelAnnotation annotation = fields[i].getAnnotation(PoiExcelAnnotation.class);
             if(annotation != null){
                 String name = fields[i].getName();
-                for (int j = 0; j <filedes.size(); j++) {
-                    if (filedes.get(j).equals(name)){
-                        fieldArr.add(name);
-                        columnArr.add(annotation.value());
+                if (filedes!=null){
+                    for (int j = 0; j <filedes.size(); j++) {
+                        if (filedes.get(j).equals(name)){
+                            fieldArr.add(name);
+                            columnArr.add(annotation.value());
+                        }
                     }
+                }else{
+                    fieldArr.add(name);
+                    columnArr.add(annotation.value());
                 }
             }
         }
@@ -68,12 +73,11 @@ public class ExcelRefAnno {
 
 
     /**
-     *导出Excel的公共调用方法
+     *导出Excel的公共调用方法 以流的形式输出 建议用这个
      * @param clazz
      * @return
      */
     public static  void exportExcelSteam(List<?> dataList, Class clazz, Map<String,Object> m, HttpServletResponse response) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
         ExcelUtilBean bean=new ExcelUtilBean();
         getExportField(bean,clazz,m);
         PoiExcelAnnotation annotation = (PoiExcelAnnotation) clazz.getAnnotation(PoiExcelAnnotation.class);

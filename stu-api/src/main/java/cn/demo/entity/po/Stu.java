@@ -26,6 +26,37 @@ public class Stu {
     @TableField
     private String address;
 
+    @TableField
+    private Integer areaId;
+    @TableField
+    private Integer provinceId;
+    @TableField
+    private Integer cityId;
+
+    public Integer getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(Integer areaId) {
+        this.areaId = areaId;
+    }
+
+    public Integer getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(Integer provinceId) {
+        this.provinceId = provinceId;
+    }
+
+    public Integer getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Integer cityId) {
+        this.cityId = cityId;
+    }
+
     public String getAddress() {
         return address;
     }

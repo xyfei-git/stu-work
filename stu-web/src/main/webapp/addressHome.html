@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/bootbox.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<body>
+<input type="hidden" id="proviceId">
+<input type="hidden" id="cityId">
+<input type="hidden" id="provinceName">
+<input type="hidden" id="cityName">
+<input type="hidden" id="areaId">
+    <div style="height: 100%;width: 28%;float: left;margin-left: 4%;background-color: #f9f2f4;border-width: 1px;border-style: solid;margin-top: 5px">
+        <center>
+            <div>省级</div>
+            <div>
+                <input type="button" onclick="addProvice()" value="添加">
+                <input type="button" onclick="delThisProvince()" value="删除">
+                <input type="button" onclick="addProvice(1)" value="修改">
+                <input type="button" onclick="exportProvinceExcel()" value="导出Excel">
+            </div>
+            <div id="provinceList" style="width: 50%">
+            </div>
+        </center>
+    </div>
+
+    <div style="height: 100%;width: 28%;float: left;margin-left: 4%;background-color: #f9f2f4;border-width: 1px;border-style: solid;margin-top: 5px">
+        <center>
+            <div>市级</div>
+            <div>
+                <input type="button" onclick="addCity()" value="添加">
+                <input type="button" onclick="delThisCity()" value="删除">
+                <input type="button" onclick="addCity()" value="修改">
+                <input type="button" onclick="exportCityExcel()" value="导出Excel">
+            </div>
+            <div id="cityList" style="width: 50%">
+
+            </div>
+        </center>
+    </div>
+
+    <div style="height: 100%;width: 28%;float: left;margin-left: 4%;background-color: #f9f2f4;border-width: 1px;border-style: solid;margin-top: 5px">
+        <center>
+            <div>县级</div>
+            <div>
+                <input type="button" onclick="addArea()" value="添加">
+                <input type="button" onclick="delThisArea()" value="删除">
+                <input type="button" onclick="addArea()" value="修改">
+                <input type="button" onclick="exportAreaExcel()" value="导出Excel">
+            </div>
+            <div id="areaList" style="width: 50%">
+
+            </div>
+        </center>
+    </div>
+</body>
+<script>
+$(function () {
+    initProvice();
+})
+
+function exportProvinceExcel() {
+    location.href="http://localhost:8083/province/exportProvinceExcel";
+}
+function exportAreaExcel() {
+    var cityId=$("#cityId").val();
+    if (cityId!=null && cityId !=""){
+        location.href="http://localhost:8083/area/exportAreaExcel?cityId="+cityId;
+    }
+}
+
+function exportCityExcel() {
+    var proviceId=$("#proviceId").val();
+    if (proviceId!=null && proviceId !=""){
+        location.href="http://localhost:8083/city/exportCityExcel?proviceId="+proviceId;
+    }
+}
+
+    function initProvice() {
+        $("#proviceId").val("");
+        $("#cityId").val("");
+        $("#areaId").val("");
+        $.ajax({
+            url: "http://localhost:8083/province/initProvice",
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    var data=re.data;
+                    var str='';
+                    for (var i = 0; i < data.length; i++) {
+                        str+='<div name="province" id="'+data[i].id+'" ><li>'+data[i].name+'</li></div>'
+                    }
+                    $("#provinceList").html(str);
+                    $("[name=province]").click(function () {
+                        var obj =this;
+                        $("[name=province]").each(function () {
+                            if (this ==obj){
+                                $(this).css("background-color","#00ccff")
+                            }else{
+                                $(this).css("background-color","")
+                                }
+                        })
+                        initCity($(this).attr("id"),$(this).text());
+                    })
+
+                    $("[name=area]").click(function () {
+                        var obj =this;
+                        $("[name=area]").each(function () {
+                            if (this ==obj){
+                                $(this).css("background-color","#00ccff")
+                            }else{
+                                $(this).css("background-color","")
+                            }
+                        })
+                    })
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+
+    function initCity(id,provinceName) {
+        $("#proviceId").val(id);
+        $("#cityId").val("");
+        $("#provinceName").val(provinceName);
+        $.ajax({
+            url: "http://localhost:8083/city/initCity",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    var str='';
+                    var data=re.data;
+                    for (var i = 0; i <data.length ; i++) {
+                        str+='<div id="'+data[i].id+'" name="city"><li>'+data[i].name+'</li></div>';
+                    }
+                    $("#areaList").html("");
+                    $("#cityList").html(str);
+
+                    $("[name=city]").click(function () {
+                        var obj =this;
+                        initArea($(this).attr("id"),$(this).text());
+                        $("[name=city]").each(function () {
+                            if (this ==obj){
+                                $(this).css("background-color","#00ccff")
+                            }else{
+                                $(this).css("background-color","")
+                            }
+                        })
+                    })
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+    function addArea() {
+        var cityId=$("#cityId").val();
+        var areaid=$("#areaId").val();
+        if (cityId!=null &&cityId!=""){
+            var cityName=$("#cityName").val();
+            bootbox.confirm({
+                size: "small",
+                message: $("#areaHtml").html(),
+                callback: function(result){
+                    if (result){
+                        $.ajax({
+                            url: "http://localhost:8083/area/saveManage",
+                            data: $("#areaForm").serialize(),
+                            dataType: "json",
+                            type: "post",
+                            success: function (re) {
+                                if (re.code == 200) {
+                                   initArea(cityId,cityName);
+                                } else {
+                                    alert(re.message);
+                                }
+                            }, error: function () {
+                                alert("请求失败");
+                            }
+                        })
+                    }
+                }
+            })
+            $("#cid").val(cityId);
+            $("#cityN").html(cityName);
+        } else{
+            alert("请选择城市");
+        }
+        if (areaid!=null && areaid!=""){
+            $.ajax({
+                url: "http://localhost:8083/area/getAreainfo",
+                data: {"id":areaid},
+                dataType: "json",
+                type: "post",
+                success: function (re) {
+                    if (re.code == 200) {
+                        var data=re.data;
+                        $("#id").val(data.id);
+                        $("#name").val(data.name);
+                        $("#cid").val(data.cid);
+                    } else {
+                        alert(re.message);
+                    }
+                }, error: function () {
+                    alert("请求失败");
+                }
+            })
+        }
+
+    }
+
+    function addCity() {
+        var cityId = $("#cityId").val();
+       var id= $("#proviceId").val();
+        var provinceName=$("#provinceName").val();
+       if (id!=null && id !=""){
+            bootbox.confirm({
+               size: "small",
+               message: $("#cityHtml").html(),
+               callback: function(result){
+                   if (result){
+                       $.ajax({
+                           url: "http://localhost:8083/city/saveManage",
+                           data: $("#cityForm").serialize(),
+                           dataType: "json",
+                           type: "post",
+                           success: function (re) {
+                               if (re.code == 200) {
+                                   initCity(id,provinceName);
+                               } else {
+                                   alert(re.message);
+                               }
+                           }, error: function () {
+                               alert("请求失败");
+                           }
+                       })
+                   }
+               }
+           })
+           $("#proviceN").text(provinceName);
+           $("#pid").val(id);
+       } else{
+           alert("请选择城市");
+       }
+       if (cityId!=null &&cityId!=""){
+           $.ajax({
+               url: "http://localhost:8083/city/getCityInfo",
+               data: {"id": cityId},
+               dataType: "json",
+               type: "post",
+               success: function (re) {
+                   if (re.code == 200) {
+                       var data=re.data;
+                       $("#id").val(data.id);
+                       $("#name").val(data.name);
+                   } else {
+                       alert(re.message);
+                   }
+               }, error: function () {
+                   alert("请求失败");
+               }
+           })
+       }
+
+
+    }
+
+    function delThisCity() {
+      var id=  $("#cityId").val();
+    if (id!=null && id!= ""){
+        $.ajax({
+            url: "http://localhost:8083/city/delThisCity",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    initCity($("#proviceId").val(),$("#provinceName").val());
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+}
+
+    function initArea(id,name) {
+
+        $("#cityId").val(id);
+        $("#cityName").val(name);
+        $("#areaId").val("");
+        $.ajax({
+            url: "http://localhost:8083/area/initArea",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    var str='';
+                    var data=re.data;
+                    for (var i = 0; i <data.length ; i++) {
+                        str+='<div id="'+data[i].id+'" name="area"><li>'+data[i].name+'</li></div>';
+                    }
+                    $("#areaList").html(str);
+                    $("[name=area]").click(function () {
+                        var obj =this;
+                        $("#areaId").val($(this).attr("id"));
+                        $("[name=area]").each(function () {
+                            if (this ==obj){
+                                $(this).css("background-color","#00ccff")
+                            }else{
+                                $(this).css("background-color","")
+                            }
+                        })
+                    })
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+    function addProvice(status) {
+        bootbox.confirm({
+            size: "small",
+            message: $("#provincehtml").html(),
+            callback: function(result){
+                if (result){
+                    $.ajax({
+                        url: "http://localhost:8083/province/saveManage",
+                        data: $("#provinceForm").serialize(),
+                        dataType: "json",
+                        type: "post",
+                        success: function (re) {
+                            if (re.code == 200) {
+                                initProvice();
+                            } else {
+                                alert(re.message);
+                            }
+                        }, error: function () {
+                            alert("请求失败");
+                        }
+                    })
+                }
+            }
+        })
+        if (status!=null){
+            var id=$("#proviceId").val();
+            if (id !=null && id != ""){
+                $.ajax({
+                    url: "http://localhost:8083/province/getThisInfo",
+                    data: {"id": id},
+                    dataType: "json",
+                    type: "post",
+                    success: function (re) {
+                        if (re.code == 200) {
+                            var data=re.data;
+                            $("#id").val(data.id);
+                            $("#name").val(data.name);
+                        } else {
+                            alert(re.message);
+                        }
+                    }, error: function () {
+                        alert("请求失败");
+                    }
+                })
+            }
+        }
+
+}
+
+function delThisProvince() {
+  var id=  $("#proviceId").val();
+    if (id==null){
+        alert("请选择删除项")
+    } else{
+        $.ajax({
+            url: "http://localhost:8083/province/delThisProvince",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                  window.history.go();
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    }
+}
+
+function delThisArea() {
+    var id=$("#areaId").val();
+    if (id!=null && id!=""){
+        $.ajax({
+            url: "http://localhost:8083/area/delThisArea",
+            data: {"id": id},
+            dataType: "json",
+            type: "post",
+            success: function (re) {
+                if (re.code == 200) {
+                    initArea($("#cityId").val(),$("#cityName").val());
+                } else {
+                    alert(re.message);
+                }
+            }, error: function () {
+                alert("请求失败");
+            }
+        })
+    } else{
+        alert("请选择");
+    }
+}
+
+</script>
+<script type="text/html" id="provincehtml">
+
+    <form id="provinceForm">
+        <input type="hidden" id="id" name="id">
+        地区名称：<input name="name" id="name" type="text">
+    </form>
+
+</script>
+
+<script type="text/html" id="cityHtml">
+    <form id="cityForm">
+        所在省份：<h5 id="proviceN"></h5>
+        <input type="hidden" id="id" name="id">
+        <input type="hidden" id="pid" name="pid">
+        地区名称：<input name="name" id="name" type="text">
+    </form>
+</script>
+<script type="text/html" id="areaHtml">
+    <form id="areaForm">
+        所在城市：<h5 id="cityN"></h5>
+        <input type="hidden" id="id" name="id">
+        <input type="hidden" id="cid" name="cid">
+        地区名称：<input name="name" id="name" type="text">
+    </form>
+</script>
+</html>

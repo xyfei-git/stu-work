@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<center>
+    <form>
+        手机号:
+        <input type="text" name="phone" id="userPhone"><br/>
+        验证码:
+        <input type="text" name="code" id="code" style="width: 79.5px"><input type="button" value="发送验证码" onclick="sendCode(this)"><br/>
+        密码：
+        <input type="password" name="passwd" id="passwd"><br/>
+        <input type="button" value="登录" onclick="checkLogin()">
+    </form>
+</center>
+</body>
+<script>
+
+    function sendCode(obj) {
+        var timer_num = 60;
+        timeClock = setInterval(function () {
+            timer_num--;
+            $(obj).val("剩余" + timer_num + "秒");
+
+            if (timer_num == 0) {
+                clearInterval(timeClock);
+                $(obj).val("发送验证码");
+            }
+        }, 1000)
+    }
+
+    function checkLogin() {
+        var phone = $("#userPhone").val();
+        var code = $("#code").val();
+        var passwd = $("#passwd").val();
+        $.ajax({
+            url:"/user/checkLogin.api",
+            data:{},
+            type:"post",
+            dataType:"json",
+            success:function (re) {
+
+            },error:function () {
+                alert("请求失败");
+            }
+        })
+    }
+
+</script>
+</html>

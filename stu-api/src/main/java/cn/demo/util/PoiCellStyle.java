@@ -27,7 +27,7 @@ public class PoiCellStyle {
         //设置字体大小
         font.setFontHeightInPoints((short) 24);
         //  font.setFontName("黑体"); //字体
-        // font.setItalic(true); //是否使用斜体
+        font.setItalic(true); //是否使用斜体
         //        font.setStrikeout(true); //是否使用划线
         //font.setColor(HSSFFont.COLOR_RED); //字体颜色
         XSSFCellStyle cellStyle=workbook.createCellStyle();
@@ -44,11 +44,13 @@ public class PoiCellStyle {
      */
     public static XSSFCellStyle colunmStyle(XSSFWorkbook workbook){
         //字体变大，加粗，居中，行高，
+        //创建字体对象
         XSSFFont font=workbook.createFont();
         //这只加粗
         font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
         //设置字体大小
         font.setFontHeightInPoints((short) 14);
+        //创建单元格样式
         XSSFCellStyle cellStyle=workbook.createCellStyle();
         cellStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);//垂直居中
         cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);//水平居中
@@ -62,7 +64,6 @@ public class PoiCellStyle {
         // 设置单元格的背景色
         cellStyle.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);// 设置前景填充样式
         cellStyle.setFillForegroundColor(HSSFColor.PALE_BLUE.index);
-
         return cellStyle;
 
     }
@@ -71,6 +72,7 @@ public class PoiCellStyle {
         XSSFFont font=workbook.createFont();
         //设置字体大小
         font.setFontHeightInPoints((short) 12);
+        //创建单元格样式
         XSSFCellStyle cellStyle=workbook.createCellStyle();
         cellStyle.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);//垂直居中
         cellStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);//水平居中
